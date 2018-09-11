@@ -1,0 +1,22 @@
+{
+  "name": "kancolle-mission-calc",
+  "version": "1.0.0",
+  "private": true,
+  "description": "",
+  "homepage": "https://github.com/wantora/kancolle-mission-calc#readme",
+  "bugs": {
+    "url": "https://github.com/wantora/kancolle-mission-calc/issues"
+  },
+  "license": "MIT",
+  "author": "wantora <wantora@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wantora/kancolle-mission-calc.git"
+  },
+  "scripts": {
+    "deploy": "gh-pages -d ./src/www"
+  },
+  "devDependencies": {
+    "gh-pages": "^1.2.0"
+  }
+}

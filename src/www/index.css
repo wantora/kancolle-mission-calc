@@ -1,0 +1,84 @@
+
+body {
+	margin: 1em;
+	font-family: Verdana, Arial, sans-serif;
+	font-size: 87.5%;
+}
+
+a:link,
+a:visited {
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+a:active {
+	text-decoration: none;
+}
+
+table {
+	background-color: #FBFBFB;
+	font-size: 85.74%;
+}
+table a {
+	color: #000;
+}
+th,
+td {
+	border: 1px solid #bbb;
+	padding: 0.2em 0.3em;
+}
+th {
+	background-color: #EBEBEB;
+}
+td {
+	text-align: right;
+}
+.variable-cell {
+	min-width: 3em;
+}
+.item-cell {
+	min-width: 3em;
+}
+.box-cell {
+	min-width: 4em;
+}
+/*tbody tr:nth-of-type(2n+1) {
+	background-color: #EBEBEB;
+}*/
+
+.name {
+	text-align: left;
+}
+
+.min_ship,
+.required_types {
+	text-align: center;
+}
+
+th[data-sortkey] {
+	cursor: pointer;
+}
+th[data-sortkey]:hover {
+	text-decoration: underline;
+}
+th[data-sorted] {
+	background-color: #bbb;
+}
+
+.exp     { background-color: #FFDDFF; }
+.fuel    { background-color: #CCEECC; }
+.ammo    { background-color: #FFFFBB; }
+.steel   { background-color: #EEEEEE; }
+.bauxite { background-color: #FFDDAA; }
+
+.area1 { background-color: #40E0D0; }
+.area2 { background-color: #9ACD32; }
+.area3 { background-color: #b0c4de; }
+.area4 { background-color: #C0C000; }
+.area5 { background-color: #ff7f50; }
+
+.negative-value   { color: #808080; }
+.disable-value    { color: #808080; text-decoration: line-through; }
+.first-value      { color: #FF0000; }
+.second-value     { color: #0000FF; }

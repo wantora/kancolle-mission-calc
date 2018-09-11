@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>艦これ 遠征報酬計算機</title>
+<link rel="stylesheet" href="normalize.css">
+<link rel="stylesheet" href="index.css">
+<script src="ie8.js"></script>
+<script src="index.js"></script>
+<script>
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	
+	ga('create', 'UA-48995077-3', 'auto');
+	ga('send', 'pageview');
+</script>
+</head>
+<body>
+
+<h1>艦これ 遠征報酬計算機</h1>
+
+<div>
+<input type="checkbox" id="check-hourly"><label for="check-hourly">時給換算</label>
+<input type="checkbox" id="check-real"><label for="check-real">実収入</label>
+<input type="checkbox" id="check-greatsuccess"><label for="check-greatsuccess">大成功</label>
+
+<label for="select-type">編成:</label><select id="select-type">
+	<option value="standard" selected>標準</option>
+	<option value="lowcost">低燃費</option>
+</select>
+
+<label for="select-greatsuccess">大成功:</label><select id="select-greatsuccess">
+	<option value="none" selected>考慮なし</option>
+	<option value="cost">キラ付け資材考慮</option>
+	<option value="rate">確率考慮</option>
+	<option value="all">すべて考慮</option>
+</select>
+
+<label for="select-min-shipnum">最低艦数(大成功時):</label><select id="select-min-shipnum">
+	<option value="0" selected>なし</option>
+	<option value="3">3</option>
+	<option value="4">4</option>
+	<option value="5">5</option>
+	<option value="6">6</option>
+</select>
+
+<input type="checkbox" id="check-expecteditem"><label for="check-expecteditem">アイテムを常に期待値で表示</label>
+</div>
+
+<table>
+	<thead>
+		<tr>
+			<th rowspan="2" data-sortkey="">ID</th>
+			<th rowspan="2">遠征名</th>
+			<th rowspan="2" data-sortkey="@-time">時間</th>
+			<th colspan="4">必要艦艇</th>
+			<th colspan="2">経験値</th>
+			<th colspan="4">報酬<span id="text-pay"></span></th>
+			<th colspan="4">出現アイテム<span id="text-item"></span></th>
+			<th colspan="2">消費量<span id="text-cost"></span></th>
+			<th colspan="2">消費割合</th>
+		</tr>
+		<tr>
+			<th data-sortkey="@-lv_ship"><abbr title="旗艦Lv">Lv</abbr></th>
+			<th data-sortkey="@-min_ship">最低</th>
+			<th>必須艦</th>
+			<th data-sortkey="@-total_lv_ship"><abbr title="艦隊合計Lv">合計</abbr></th>
+			<th class="variable-cell exp" data-sortkey="exp">提督</th>
+			<th class="variable-cell exp" data-sortkey="ship_exp">艦娘</th>
+			<th class="variable-cell fuel" data-sortkey="fuel">燃料</th>
+			<th class="variable-cell ammo" data-sortkey="ammo">弾薬</th>
+			<th class="variable-cell steel" data-sortkey="steel">鋼材</th>
+			<th class="variable-cell bauxite" data-sortkey="bauxite"><abbr title="ボーキサイト">ボ</abbr></th>
+			<th class="item-cell" data-sortkey="repair_item_value">修復</th>
+			<th class="item-cell" data-sortkey="build_item_value">建造</th>
+			<th class="item-cell" data-sortkey="material_item_value">開発</th>
+			<th class="box-cell" data-sortkey="box_item_value">家具箱</th>
+			<th class="variable-cell" data-sortkey="-fuel_cost">燃料</th>
+			<th class="variable-cell" data-sortkey="-ammo_cost">弾薬</th>
+			<th data-sortkey="@-fuel_cost">燃料</th>
+			<th data-sortkey="@-ammo_cost">弾薬</th>
+		</tr>
+	</thead>
+	<tfoot id="mission-footer">
+		<tr>
+			<th data-sortkey="">ID</th>
+			<th>遠征名</th>
+			<th data-sortkey="@-time">時間</th>
+			<th data-sortkey="@-lv_ship"><abbr title="旗艦Lv">Lv</abbr></th>
+			<th data-sortkey="@-min_ship">最低</th>
+			<th>必須艦</th>
+			<th data-sortkey="@-total_lv_ship"><abbr title="艦隊合計Lv">合計</abbr></th>
+			<th class="variable-cell exp" data-sortkey="exp">提督</th>
+			<th class="variable-cell exp" data-sortkey="ship_exp">艦娘</th>
+			<th class="variable-cell fuel" data-sortkey="fuel">燃料</th>
+			<th class="variable-cell ammo" data-sortkey="ammo">弾薬</th>
+			<th class="variable-cell steel" data-sortkey="steel">鋼材</th>
+			<th class="variable-cell bauxite" data-sortkey="bauxite"><abbr title="ボーキサイト">ボ</abbr></th>
+			<th class="item-cell" data-sortkey="repair_item_value">修復</th>
+			<th class="item-cell" data-sortkey="build_item_value">建造</th>
+			<th class="item-cell" data-sortkey="material_item_value">開発</th>
+			<th class="box-cell" data-sortkey="box_item_value">家具箱</th>
+			<th class="variable-cell" data-sortkey="-fuel_cost">燃料</th>
+			<th class="variable-cell" data-sortkey="-ammo_cost">弾薬</th>
+			<th data-sortkey="@-fuel_cost">燃料</th>
+			<th data-sortkey="@-ammo_cost">弾薬</th>
+		</tr>
+	</tfoot>
+</table>
+
+<h2>説明</h2>
+
+<ul>
+<li>計算に必要なデータは<a href="http://wikiwiki.jp/kancolle/">艦隊これくしょん -艦これ- 攻略Wiki</a>を参考にさせて頂きました。</li>
+<li>表の見出しをクリックすることで並び替えることが出来ます。</li>
+<li>消費資材の計算に使う艦艇は <strong>"編成"</strong> から変更できます。
+	<ul>
+	<li><strong>"標準"</strong> は初期型 (改造必須の艦種を除く) の中で最も数が多い型で計算します。不足は駆逐艦で埋めてあります。</li>
+	<li><strong>"低燃費"</strong> は燃費が良く、かつ必要十分な数があるものを使用して計算します。不足は駆逐艦で埋めてあります。
+		<ul>
+		<li>具体的には、駆逐艦は睦月型、軽巡洋艦は天龍型、重巡洋艦は古鷹型・青葉型、空母は龍驤型・祥鳳型・千歳型で計算しています。(すべて未改造)</li>
+		</ul>
+	</li>
+	</ul>
+</li>
+<li>大成功時の計算も必要最低限の数で計算してあります。</li>
+<li>大成功:<strong>"キラ付け資材考慮"</strong> の場合、キラ付けで消費する資材を報酬から差し引きます。
+	<ul>
+	<li>キラ付けの方法は、1-1に単艦で出撃し初戦S、次戦A(夜戦なし)を想定し計算しています。</li>
+	</ul>
+</li>
+<li>大成功:<strong>"確率考慮"</strong> の場合、大成功になる確率を考慮します。大成功率は2隻で50%、1隻増えるごとに15%増加 (ただし6隻の場合は100%) として計算しています。
+	<ul>
+	<li><a href="http://jbbs.livedoor.jp/bbs/read.cgi/netgame/12394/1382577124/107">検証、仮説スレ7 107</a>のデータを使わせていただきました。</li>
+	</ul>
+</li>
+<li>大成功にチェックが入っている時は <strong>"最低艦数(大成功時)"</strong> まで編成するようになります。大成功率を上げる場合に使用します。</li>
+<li>アイテムの入手率は以下の仮説を使用しています。
+	<ul>
+	<li>1個目は50%の確率で入手、2個目は1個目を入手できた場合に再抽選し50%の確率で入手できる。</li>
+	<li>右側に書いてあるアイテムは大成功の場合のみ入手でき、1個目は必ず入手できる。</li>
+	</ul>
+</li>
+<li>表の艦娘経験値は期待値です。例えば「警備任務」で「成功」の場合30EXPもしくは60EXPをそれぞれ50%の確率で獲得します。(大成功の場合は更に2倍)
+	<ul>
+	<li>艦娘経験値のデータは<a href="http://jbbs.shitaraba.net/bbs/read.cgi/netgame/12394/1387515725/889">検証、仮説スレ 10 889</a>を使わせていただきました。</li>
+	</ul>
+</li>
+<li>Internet Explorer 7以前では動きません。</li>
+</ul>
+
+<h2>更新履歴</h2>
+
+<dl>
+<dt>2015-05-23</dt>
+<dd>
+	<ul>
+	<li>北方航路海上護衛、水上機前線輸送の艦娘経験値を追加</li>
+	</ul>
+</dd>
+<dt>2015-05-20</dt>
+<dd>
+	<ul>
+	<li>北方航路海上護衛、水上機前線輸送を追加 (艦娘経験値はまだ未対応)</li>
+	<li>wikiに合わせて経験値行に色を付けた</li>
+	<li>艦娘経験値の並び替えがうまくいかないバグを修正</li>
+	<li>説明を微修正</li>
+	</ul>
+</dd>
+<dt>2015-02-22</dt>
+<dd>
+	<ul>
+	<li>遠洋練習航海を追加</li>
+	<li>「消費目盛」を「消費割合」に変更</li>
+	</ul>
+</dd>
+<dt>2015-02-08</dt>
+<dd>
+	<ul>
+	<li>Google Drive でうまく動かないので heroku にサーバーを移転</li>
+	</ul>
+</dd>
+<dt>2014-06-19</dt>
+<dd>
+	<ul>
+	<li>遠洋潜水艦作戦を追加</li>
+	<li>東京急行(弐)の提督EXPを修正</li>
+	</ul>
+</dd>
+<dt>2014-03-18</dt>
+<dd>
+	<ul>
+	<li>並び替えを実装</li>
+	<li>「アイテムを常に期待値で表示」を実装</li>
+	<li>大成功率を「2隻で60%、1隻ごとに10%増加」から「2隻で50%、1隻ごとに15%増加」に変更</li>
+	</ul>
+</dd>
+<dt>2014-03-17</dt>
+<dd>
+	<ul>
+	<li>必要なドラム缶の数を修正、IE8等で動かないバグを修正</li>
+	</ul>
+</dd>
+<dt>2014-03-15</dt>
+<dd>
+	<ul>
+	<li>新遠征を追加</li>
+	<li>遠征表をスリム化</li>
+	<li>Google Analyticsを追加</li>
+	</ul>
+</dd>
+<dt>2014-03-04</dt>
+<dd>
+	<ul>
+	<li>北方鼠輸送作戦、艦隊演習の合計Lvを追加</li>
+	</ul>
+</dd>
+<dt>2014-03-01</dt>
+<dd>
+	<ul>
+	<li>新遠征を追加</li>
+	<li>通商破壊作戦、水上機基地建設の報酬変更に対応</li>
+	<li>艦娘経験値を追加</li>
+	</ul>
+</dd>
+<dt>2014-01-03</dt>
+<dd>
+	<ul>
+	<li>最低Lvを攻略Wikiにあわせて修正</li>
+	</ul>
+</dd>
+<dt>2013-12-07</dt>
+<dd>
+	<ul>
+	<li>アイテムの時給換算に対応</li>
+	</ul>
+</dd>
+<dt>2013-12-03</dt>
+<dd>
+	<ul>
+	<li>公開</li>
+	</ul>
+</dd>
+</dl>
+
+</body>
+</html>
